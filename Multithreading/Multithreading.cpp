@@ -5,14 +5,16 @@
 using namespace std;
 
 				//Многозадачность и многопоточность
-				//Поток с параметрами
+				// std::ref()
+				//получение результатов работы функции из потока 
 			
 
-void DoWorK(int a,int b,string msg)
+void DoWorK(int &a,int &b)
 {
 	cout << "------------\tStart DoWorK()\t------------" << endl;
 	this_thread::sleep_for(chrono::milliseconds(2000));
-	cout << "\t DoWork = " << a + b <<"\t" << msg << endl;
+	a =a + b;
+	cout << "\t DoWork = " << a <<"\t" << endl;
 	this_thread::sleep_for(chrono::milliseconds(2000));
 	cout << "------------\tEND DoWorK()\t------------\t" << endl;
 
@@ -21,11 +23,14 @@ void DoWorK(int a,int b,string msg)
 int main()
 {
 	setlocale(LC_ALL, "ru");
-	thread th(DoWorK,2, 4, "MSG *Hi bro*");
+	int a = 2;
+	int b = 4;
+	//DoWorK(a, b);
+	thread th(DoWorK, std::ref(a), std::ref(b));
 	
 
 	
-	for (rsize_t i=0;true; ++i)
+	for (rsize_t i=0;i<10; ++i)
 	{
 
 		cout << "ID thread = " << this_thread::get_id() << "\t int main(){} " << i << endl;
@@ -34,7 +39,7 @@ int main()
 
 
 	
-	//th.join();
-	
+	th.join();
+	cout << a << endl;
 	return 0;
 }
