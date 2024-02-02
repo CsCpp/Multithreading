@@ -1,76 +1,50 @@
 ﻿#include<iostream>
 #include<thread>
+#include<mutex>
 #include<chrono>
 
 using namespace std;
 
-				//Многозадачность и многопоточность
-				// запуск методов класса в отдельном потоке
-class myClass {
-public:
+				//Mutex
+				// синхронизация потоков
+//Защита разделяемых данных
+
+mutex mtx;
+
+void Print(char ch)
+{
+	this_thread::sleep_for(chrono::milliseconds(2000));
+	mtx.lock();
+
+	for (int i = 0; i < 5; ++i)
+	{
+		for (int i = 0; i < 10; i++)
+		{
+			
+			cout << ch;
+		
+			this_thread::sleep_for(chrono::milliseconds(20));
+
+		}
+		
+		cout << endl;
+		
+	}
 	
-	void DoWork ()
-	{
-		
-		cout << "------------\tStart DoWork\t------------" << this_thread::get_id() << endl;
-		this_thread::sleep_for(chrono::milliseconds(7000));
-		cout << "------------\tEND DoWork\t------------\t" << this_thread::get_id() << endl;
-	
-	}
-	void DoWork2(int a)
-	{
-		
-		cout << "------------\tStart DoWork2\t------------" << this_thread::get_id() << endl;
-		this_thread::sleep_for(chrono::milliseconds(4000));
-
-		cout << "\t DoWork2 - значение параметра = " << a << "\t" << endl;
-		this_thread::sleep_for(chrono::milliseconds(4000));
-		cout << "------------\tEND DoWork2\t------------\t" << this_thread::get_id() << endl;
-
-	}
-	int Sum(int& a, int& b)
-	{
-		
-		cout << "------------\tStart Sum\t------------" << this_thread::get_id() << endl;
-		this_thread::sleep_for(chrono::milliseconds(3000));
-
-		cout << "\t Sum a+b = " << a+b << "\t" << endl;
-		this_thread::sleep_for(chrono::milliseconds(3000));
-		cout << "------------\tEND Sum\t------------\t" << this_thread::get_id() << endl;
-		return a + b;
-	}
-
-};
-
+	cout << endl;
+	mtx.unlock();
+	this_thread::sleep_for(chrono::milliseconds(2000));
+}
 
 
 int main()
 {
 	setlocale(LC_ALL, "ru");
-	myClass m;
-
+	thread t1(Print, '*');
+	thread t2(Print, '#');
+	thread t3(Print, '&');
 	
-	int a = 2;
-	int b = 4;
-	int result;
-	thread t3(&myClass::DoWork2,m,a);
-
-	thread t2(&myClass::DoWork, m);
-
-	thread t([&]() {result = m.Sum(a, b);});
-	
-
-
-	for (rsize_t i=0;i<10; ++i)
-	{
-		
-		cout << "ID thread = " << this_thread::get_id() << "\t int main(){} " << i << endl;
-		this_thread::sleep_for(chrono::milliseconds(500));
-	}
-
-	
-	t.join();
-	cout << "Результат работы метода SUM = " << result << endl;
+	t1.join();
 	t2.join();
 	t3.join();
 
