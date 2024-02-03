@@ -5,34 +5,36 @@
 
 using namespace std;
 
-				//Mutex
-				// синхронизация потоков
+//Lock_guard
+// синхронизация потоков				
 //Защита разделяемых данных
-
+								
 mutex mtx;
 
 void Print(char ch)
 {
+	
 	this_thread::sleep_for(chrono::milliseconds(2000));
-	mtx.lock();
-
-	for (int i = 0; i < 5; ++i)
 	{
-		for (int i = 0; i < 10; i++)
+		lock_guard<mutex> guard(mtx);
+		for (int i = 0; i < 5; ++i)
 		{
-			
-			cout << ch;
-		
-			this_thread::sleep_for(chrono::milliseconds(20));
+			for (int i = 0; i < 10; i++)
+			{
+
+				cout << ch;
+
+				this_thread::sleep_for(chrono::milliseconds(20));
+
+			}
+
+			cout << endl;
 
 		}
-		
+
 		cout << endl;
-		
 	}
 	
-	cout << endl;
-	mtx.unlock();
 	this_thread::sleep_for(chrono::milliseconds(2000));
 }
 
