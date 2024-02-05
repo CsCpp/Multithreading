@@ -5,85 +5,43 @@
 
 using namespace std;
 
-//взаимная блокировка
-// DeadLock
+//recursive_mutex
 
-								
-mutex mtx1;
-mutex mtx2;
 
-void Print()
+recursive_mutex rm;
+mutex m;
+
+void Foo(int a)
 {
-	mtx1.lock();
-	this_thread::sleep_for(chrono::milliseconds(1000));
-	mtx2.lock();
-	this_thread::sleep_for(chrono::milliseconds(200));
+	rm.lock();
+	cout << a << " ";
+	this_thread::sleep_for(chrono::milliseconds(300));
+	if (a <= 1)
 	{
-		
-		for (int i = 0; i < 5; ++i)
-		{
-			for (int i = 0; i < 10; i++)
-			{
-
-				cout << "*";
-
-				this_thread::sleep_for(chrono::milliseconds(20));
-
-			}
-
-			cout << endl;
-
-		}
-
 		cout << endl;
+		rm.unlock();
+		return;
 	}
-	
-	this_thread::sleep_for(chrono::milliseconds(200));
-	
-	mtx1.unlock();
-	mtx2.unlock();
+	a--;
+
+	Foo(a);
+	rm.unlock();
+
 }
-void Print2()
-{
-	mtx2.lock();
-	this_thread::sleep_for(chrono::milliseconds(1000));
-	mtx1.lock();
-	this_thread::sleep_for(chrono::milliseconds(200));
-	{
-		
-		for (int i = 0; i < 5; ++i)
-		{
-			for (int i = 0; i < 10; i++)
-			{
 
-				cout << "#";
-
-				this_thread::sleep_for(chrono::milliseconds(20));
-
-			}
-
-			cout << endl;
-
-		}
-
-		cout << endl;
-	}
-
-	this_thread::sleep_for(chrono::milliseconds(200));
-
-	mtx1.unlock();
-	mtx2.unlock();
-}
 
 int main()
 {
 	setlocale(LC_ALL, "ru");
-	thread t1(Print);
-	thread t2(Print2);
-	
+	thread t1(Foo, 10);
+	this_thread::sleep_for(chrono::milliseconds(500));
+	thread t2(Foo, 10);
+
+
 	
 	t1.join();
 	t2.join();
+
 	
 
 	return 0;
