@@ -5,37 +5,42 @@
 
 using namespace std;
 
-//recursive_mutex
+//unique_lock
 
 
 recursive_mutex rm;
 mutex m;
 
-void Foo(int a)
+void Print(char ch)
 {
-	rm.lock();
-	cout << a << " ";
-	this_thread::sleep_for(chrono::milliseconds(300));
-	if (a <= 1)
+	unique_lock<mutex> ul(m,std::defer_lock);
+//	lock_guard<mutex> lg(m);
+	this_thread::sleep_for(chrono::milliseconds(2000));
+	ul.lock();
+//	m.lock();
+//	{	lock_guard<mutex> lg(m);
+	for (int i = 0; i < 5; i++)
 	{
+		for (int i = 0; i < 10; i++)
+		{
+			cout << ch;
+			this_thread::sleep_for(chrono::milliseconds(10));
+		}
 		cout << endl;
-		rm.unlock();
-		return;
 	}
-	a--;
-
-	Foo(a);
-	rm.unlock();
-
+	cout << endl;
+//	}
+//	m.unlock();
+	ul.unlock();
+	this_thread::sleep_for(chrono::milliseconds(2000));
 }
-
 
 int main()
 {
 	setlocale(LC_ALL, "ru");
-	thread t1(Foo, 10);
+	thread t1(Print, '*');
 	this_thread::sleep_for(chrono::milliseconds(500));
-	thread t2(Foo, 10);
+	thread t2(Print, '#');
 
 
 	
