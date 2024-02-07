@@ -5,7 +5,7 @@
 
 using namespace std;
 
-//unique_lock
+//Время выполнения
 
 
 recursive_mutex rm;
@@ -38,6 +38,10 @@ void Print(char ch)
 int main()
 {
 	setlocale(LC_ALL, "ru");
+
+	auto start = chrono::high_resolution_clock::now();
+
+
 	thread t1(Print, '*');
 	this_thread::sleep_for(chrono::milliseconds(500));
 	thread t2(Print, '#');
@@ -46,8 +50,9 @@ int main()
 	
 	t1.join();
 	t2.join();
-
-	
+	auto stop = chrono::high_resolution_clock::now();
+	chrono::duration<float> duration = stop - start;
+	cout << "Duration = " << duration.count()<<"s" << endl;
 
 	return 0;
 }
